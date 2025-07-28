@@ -15,7 +15,7 @@ with open("color_id.csv", "r") as f:
         provinces[int(id)] = {
             "color": color,
             "id": id,
-            "is-ocean": (color[1] >= 200 and color[2] >= 200 and color[0] <= 125),
+            "is-ocean": (color[1] >= 200 and color[2] >= 200 and color[0] <= 140),
             "hex-color": '#%02x%02x%02x' % color, 
             "borders": {},
             "bodies": [],

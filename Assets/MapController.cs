@@ -5,6 +5,7 @@ using UnityEngine;
 public class MapController : MonoBehaviour
 {	
 	public List<Color32> colors;
+	public Texture2D map;
 	
 	List<Color32> backupColors = new List<Color32>();
 	Texture2D texture;
@@ -60,7 +61,40 @@ public class MapController : MonoBehaviour
         texture.Apply();
 	}
 	
+	public Vector3 lastPosition = new Vector3(0,0,-1);
+	public Camera playerCamera;
 	void Update(){
 		SetColors();
+		if(Input.GetMouseButton(1)){
+			Vector3 currentPosition = Input.mousePosition;
+			if(lastPosition.z != -1){
+				playerCamera.transform.position = new Vector3(
+					playerCamera.transform.position.x + lastPosition.x - currentPosition.x, 
+					playerCamera.transform.position.y + lastPosition.y - currentPosition.y, 
+					playerCamera.transform.position.z);
+			}
+			lastPosition = currentPosition;
+		} else {
+			lastPosition = new Vector3(0,0,-1);
+		}
+        if(Input.GetMouseButtonDown(0))
+		{
+			Vector3 p = Input.mousePosition;
+			p.z = 20;
+			Vector3 pos = Camera.main.ScreenToWorldPoint(p);
+			pos.y *= -2;
+			pos.x *= 2;
+			
+			if(pos.x < map.width && pos.x > 0 && pos.y < map.height && pos.y > 0)
+			{
+				Color pixel = (map.GetPixel((int)pos.x, map.height - (int)pos.y));
+				//print($"({pos.x},{pos.y}):{pixel.g * 255},{pixel.r * 255}");
+				int id = (int)(pixel.r * 255f * 256f) + (int)(pixel.g * 255f);
+				selected = id;
+			} else {
+				selected = -1;
+			}
+		}  
     }
+	
 }

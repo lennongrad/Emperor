@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 public class GenerateBorders : MonoBehaviour
 {
@@ -46,7 +47,7 @@ public class GenerateBorders : MonoBehaviour
 		var tempList = bordersContainer.transform.Cast<Transform>().ToList();
 		foreach(var child in tempList)
 		{
-			if(child.GetComponent<LineRenderer>() != null) {
+			if(child.GetComponent<BorderController>() != null) {
 				GameObject.DestroyImmediate(child.gameObject);
 			}
 		}
@@ -71,7 +72,9 @@ public class GenerateBorders : MonoBehaviour
 				Vector3 pos = new Vector3(words[i], -words[i+1], 0);
 				lr.SetPosition((i - 1) / 2, pos);
 			}
-		}		
+			
+			lr.Simplify(0.1f);
+		}	
     }
 
     [MenuItem("MyMenu/Update Map", true)]
