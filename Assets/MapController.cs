@@ -63,14 +63,24 @@ public class MapController : MonoBehaviour
 	
 	public Vector3 lastPosition = new Vector3(0,0,-1);
 	public Camera playerCamera;
+	public float baseZoom = 400f;
+	float targetZoom = -1f;
 	void Update(){
 		SetColors();
-		if(Input.GetMouseButton(1)){
+		
+		if(targetZoom < 0){
+			targetZoom = baseZoom;
+		}
+		targetZoom -= Input.mouseScrollDelta.y * 15f;
+		playerCamera.orthographicSize = (int)Mathf.Lerp(playerCamera.orthographicSize, targetZoom, 0.1f);
+		
+		if(Input.GetMouseButton(2)){
 			Vector3 currentPosition = Input.mousePosition;
+			float modifier = playerCamera.orthographicSize / baseZoom;
 			if(lastPosition.z != -1){
 				playerCamera.transform.position = new Vector3(
-					playerCamera.transform.position.x + lastPosition.x - currentPosition.x, 
-					playerCamera.transform.position.y + lastPosition.y - currentPosition.y, 
+					playerCamera.transform.position.x + (lastPosition.x - currentPosition.x) * modifier, 
+					playerCamera.transform.position.y + (lastPosition.y - currentPosition.y) * modifier, 
 					playerCamera.transform.position.z);
 			}
 			lastPosition = currentPosition;
