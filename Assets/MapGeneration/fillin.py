@@ -1,17 +1,17 @@
 import random
 from PIL import Image
 
-image = Image.open("lilliemap_4.bmp", "r").convert("RGB")
+image = Image.open("provinces_final_2.bmp", "r").convert("RGB")
 width = image.size[0]
 height = image.size[1]
 pixel_array = list(image.getdata())
 
 coastal_land_points_desired = 1200
 land_points_desired = 4000
-coastal_sea_points_desired = 250
-sea_points_desired = 250
+coastal_sea_points_desired = 4000
+sea_points_desired = 800
 starter_threshold = 100
-min_threshold = 20
+min_threshold = 50
 
 def get_color(point, pixels):
     if 0 < point[0] < width and 0 < point[1] < height:
@@ -60,35 +60,37 @@ def validate_point(point, points, threshold=10):
     
     return True, False
 
-print("Choose coastal points")
-for i in range(coastal_land_points_desired):
-    point = random.choice(coastal_land_points)
-    
-    attempts = 0
-    v1, v2 = validate_point(point,chosen_points,threshold=starter_threshold-attempts)
-    while not v1:
+if len(coastal_land_points) > coastal_land_points_desired:
+    print("Choose coastal points")
+    for i in range(coastal_land_points_desired):
         point = random.choice(coastal_land_points)
-        v1, v2 = validate_point(point,chosen_points,threshold=max(min_threshold, starter_threshold-attempts))
-        if v2: 
-            attempts += 1
-    
-    chosen_points.append(point)
+        
+        attempts = 0
+        v1, v2 = validate_point(point,chosen_points,threshold=starter_threshold-attempts)
+        while not v1:
+            point = random.choice(coastal_land_points)
+            v1, v2 = validate_point(point,chosen_points,threshold=max(min_threshold, starter_threshold-attempts))
+            if v2: 
+                attempts += 1
+        
+        chosen_points.append(point)
 
-print("Choose inland points")
-for i in range(land_points_desired):
-    point = random.choice(land_points)
-    
-    attempts = 0
-    v1, v2 = validate_point(point,chosen_points,threshold=starter_threshold-attempts)
-    while not v1:
+if len(land_points) > land_points_desired:
+    print("Choose inland points")
+    for i in range(land_points_desired):
         point = random.choice(land_points)
-        v1, v2 = validate_point(point,chosen_points,threshold=max(min_threshold, starter_threshold-attempts))
-        if v2: 
-            attempts += 1
-            if attempts > (starter_threshold - min_threshold) + 20:
-                print(attempts)
-    
-    chosen_points.append(point)
+        
+        attempts = 0
+        v1, v2 = validate_point(point,chosen_points,threshold=starter_threshold-attempts)
+        while not v1:
+            point = random.choice(land_points)
+            v1, v2 = validate_point(point,chosen_points,threshold=max(min_threshold, starter_threshold-attempts))
+            if v2: 
+                attempts += 1
+                if attempts > (starter_threshold - min_threshold) + 20:
+                    print(attempts)
+        
+        chosen_points.append(point)
     
 print("Choose coastal sea points")
 for i in range(coastal_sea_points_desired):
@@ -216,5 +218,5 @@ with open("color_id_lillie.csv", "w") as f:
 
 new_image = Image.new(image.mode, image.size)
 new_image.putdata(adjusted_pixels)
-new_image.save("lilliemap_4_test.bmp")
+new_image.save("lilliemap_4_test_2.bmp")
 new_image.show()

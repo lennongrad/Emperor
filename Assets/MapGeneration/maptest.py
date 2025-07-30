@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 import networkx as nx
 
-image = Image.open("lilliemap_4_test.bmp", "r").convert("RGB")
+image = Image.open("provinces_final.bmp", "r").convert("RGB")
 width = image.size[0]
 height = image.size[1]
 pixel_array = list(image.getdata())
