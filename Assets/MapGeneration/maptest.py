@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 import networkx as nx
 
-image = Image.open("testmap.bmp", "r").convert("RGB")
+image = Image.open("lilliemap_4_test.bmp", "r").convert("RGB")
 width = image.size[0]
 height = image.size[1]
 pixel_array = list(image.getdata())
@@ -61,7 +61,7 @@ for pixel_x in range(0, width):
                 "id": new_color[3],
                 "id_string": f"{pixel_color[0]},{pixel_color[1]},{pixel_color[2]},{new_color[3]}",
                 "global_id": global_id,
-                "is-ocean": (pixel_color[1] >= 200 and pixel_color[2] >= 200 and pixel_color[0] <= 125),
+                "is-ocean": pixel_color[2] >= 200,
                 "color-hex": '#%02x%02x%02x' % pixel_color, 
                 "base-points": {},
                 "borders": {},
@@ -350,10 +350,10 @@ for province in empty_provinces:
 provinces_by_id = {}
 id_by_color = {}
 missing_ids = []
-with open("color_id.csv", "r") as f:
+with open("color_id_lillie.csv", "r") as f:
     for line in f:
-        R, G, B, id = line.strip().split(",")
-        R, G, B, id = int(R), int(G), int(B), int(id)
+        R, G, B, id, is_ocean = line.strip().split(",")
+        R, G, B, id, is_ocean = int(R), int(G), int(B), int(id), bool(is_ocean)
         
         next_color = (R,G,B,0)
         iterations = 0
