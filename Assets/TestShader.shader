@@ -60,7 +60,10 @@ Shader "Unlit/NewUnlitShader" {
 				int b = color.z * 255.0;
 				
 				float4 result = float4(0.0, 0.0, 0.0, 0.0);
-				if(r < 32){
+				if(g == 255){
+					result = tex2D(_MainTex, float2(0.999, color.x*8.0));
+					// idk why this is necessary lol
+				} else {
 					result = tex2D(_MainTex, float2(color.y, color.x * 8.0));
 				}
 				
