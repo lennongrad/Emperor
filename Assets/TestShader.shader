@@ -1,9 +1,8 @@
 Shader "Unlit/NewUnlitShader" {
     Properties {
         _MainTex ("Colors (RGB)", 2D) = "white"
+        _SecondaryTex ("Secondary Colors (RGB)", 2D) = "white"
         _MapTex ("Map (RGB)", 2D) = "white"
-        _HeightTex ("Height (RGB)", 2D) = "white"
-		_V ("V", Vector) = (0.0, 0.0, 0.0)
     }
     SubShader {    
         Cull front 
@@ -13,8 +12,11 @@ Shader "Unlit/NewUnlitShader" {
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+			
+			#define PI 3.1415926538
             
             uniform sampler2D _MainTex;
+            uniform sampler2D _SecondaryTex;
             uniform sampler2D _MapTex;
             uniform sampler2D _HeightTex;
 			
@@ -43,7 +45,7 @@ Shader "Unlit/NewUnlitShader" {
 				// o.normalDir = UnityObjectToWorldNormal(v.normal);
 				// UNITY_TRANSFER_FOG(o,o.pos);
 				// //TRANSFER_VERTEX_TO_FRAGMENT(o)
-				float3 dcolor = tex2Dlod (_HeightTex, float4(o.uv,0,0));
+				//float3 dcolor = tex2Dlod (_HeightTex, float4(o.uv,0,0));
 				// float d = (dcolor.r + dcolor.g + dcolor.b);
 				//v.vertex.xyz += v.normal; //* d;
 				//v.vertex += _V * dcolor.g;
@@ -60,11 +62,15 @@ Shader "Unlit/NewUnlitShader" {
 				int b = color.z * 255.0;
 				
 				float4 result = float4(0.0, 0.0, 0.0, 0.0);
+				float2 pos = float2(color.y, color.x * 8.0);
 				if(g == 255){
-					result = tex2D(_MainTex, float2(0.999, color.x*8.0));
-					// idk why this is necessary lol
+					pos = float2(0.999, color.x*8.0);
+				}
+				
+				if(sin((i.uv.y-i.uv.x) * 512 * PI) > 0.0){ 
+					result = tex2D(_MainTex, pos);
 				} else {
-					result = tex2D(_MainTex, float2(color.y, color.x * 8.0));
+					result = tex2D(_SecondaryTex, pos);
 				}
 				
                 return result;

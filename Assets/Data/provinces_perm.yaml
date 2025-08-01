@@ -1,0 +1,12 @@
+provinces:
+  - id: 0
+    name: Jack
+    terrain: 0
+    centerX: 0
+    centerY: 0
+  - id: 1
+    name: Claudia
+    terrain: 1
+    centerX: 0
+    centerY: 0
+    

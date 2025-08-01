@@ -1,0 +1,6 @@
+religions:
+  - id: 0
+    name: Catholic
+  - id: 1
+    name: Muslim
+    

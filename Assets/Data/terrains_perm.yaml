@@ -1,0 +1,6 @@
+terrains:
+  - id: 0
+    name: Forest
+  - id: 1
+    name: Desert
+    

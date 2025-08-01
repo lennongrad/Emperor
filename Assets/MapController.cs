@@ -9,6 +9,7 @@ public class MapController : MonoBehaviour
 	
 	List<Color32> backupColors = new List<Color32>();
 	Texture2D texture;
+	Texture2D secondaryTexture;
 	
 	public int selected = -1;
 	
@@ -37,16 +38,28 @@ public class MapController : MonoBehaviour
 		return baseColor;
 	}
 	
+	Color32 GetSecondaryProvinceColor(int id){
+		return GetProvinceColor(id);
+	}
+	
 	public void SetColors() {
         if(texture == null){
-			texture = (Texture2D)GetComponent<Renderer>().sharedMaterial.mainTexture;
 			
 			//new Texture2D(256, 32, TextureFormat.RGBA32, false);
 			//GetComponent<Renderer>().material.mainTexture = texture;
 			//texture.filterMode = FilterMode.Point;
 		}
 		
+		if(secondaryTexture == null){
+			// secondaryTexture = new Texture2D(256, 32, TextureFormat.RGBA32, false);
+			// GetComponent<Renderer>().material.SetTexture("_SecondaryTex", secondaryTexture);
+			// secondaryTexture.filterMode = FilterMode.Point;
+		}
+		
+		texture = (Texture2D)GetComponent<Renderer>().sharedMaterial.GetTexture("_MainTex");
+		secondaryTexture = (Texture2D)GetComponent<Renderer>().sharedMaterial.GetTexture("_SecondaryTex");
         var data = texture.GetRawTextureData<Color32>();
+        var secondaryData = secondaryTexture.GetRawTextureData<Color32>();
 
         int index = 0;
         for (int y = 0; y < texture.height; y++)
@@ -54,11 +67,13 @@ public class MapController : MonoBehaviour
             for (int x = 0; x < texture.width; x++)
             {
                 data[index] = GetProvinceColor(index);
+				secondaryData[index] = GetSecondaryProvinceColor(index);
 				index += 1;
             }
         }
 		
         texture.Apply();
+        secondaryTexture.Apply();
 	}
 	
 	public Vector3 lastPosition = new Vector3(0,0,-1);

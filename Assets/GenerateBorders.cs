@@ -37,7 +37,21 @@ public class GenerateBorders : MonoBehaviour
 		
 		mapController.transform.position = new Vector3(maxX/2, -maxY/2, 0);
 		mapController.transform.localScale = new Vector3(-maxX/10f, 0, maxY/10f);
+		
+		Debug.Log("Updated map!");
 	}
+	
+	
+    [MenuItem("MyMenu/Test")]
+	static void Test() 
+	{	
+		var (loadedTerrains, loadedCultures, loadedReligions, loadedCountries, loadedProvinces) = LoadPermanentData.Load();
+		
+		foreach(var province in loadedProvinces.Values){
+			Debug.Log(province);
+		}
+	}
+
 	
     [MenuItem("MyMenu/Update Borders")]
     static void UpdateBorders()
@@ -75,6 +89,8 @@ public class GenerateBorders : MonoBehaviour
 			
 			lr.Simplify(0.1f);
 		}	
+		
+		Debug.Log("Updated borders!");
     }
 
     [MenuItem("MyMenu/Update Map", true)]
