@@ -15,7 +15,7 @@ public class InitializeData
 		Dictionary<int, Province> loadedProvinces
 	) 
 	{
-		
+		InitializeProvinces(loadedTerrains, loadedCultures, loadedReligions, loadedCountries, loadedProvinces);
 	}
 	
 	
@@ -23,7 +23,7 @@ public class InitializeData
 	
 	
 	// provinces
-	public void InitializeProvinces(
+	public static void InitializeProvinces(
 		Dictionary<int, Terrain> loadedTerrains,
 		Dictionary<int, Culture> loadedCultures,
 		Dictionary<int, Religion> loadedReligions,
@@ -42,9 +42,7 @@ public class InitializeData
 		foreach (var initProvince in provinceList.Provinces)
 		{
 			if(loadedProvinces.ContainsKey(initProvince.id)){
-				var matchingProvince = loadedProvinces[initProvince.id];
-				
-				matchingProvince.population = initProvince.Population;
+				loadedProvinces[initProvince.id].population = initProvince.Population;
 			}
 		}
 	}

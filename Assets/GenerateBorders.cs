@@ -3,6 +3,8 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions; 
 
 public class GenerateBorders : MonoBehaviour
 {
@@ -16,22 +18,21 @@ public class GenerateBorders : MonoBehaviour
 		float maxX = 0;
 		float maxY = 0;
 		
-        string path = "Assets/MapGeneration/borders_points.csv";
+        string path = "Assets/Data/borders_perm.yaml";
         StreamReader reader = new StreamReader(path); 
+
+		var deserializer = new DeserializerBuilder()
+			.WithNamingConvention(CamelCaseNamingConvention.Instance)
+			.Build();
+
+		var bordersList = deserializer.Deserialize<BordersList>(reader);
 		
-		string line;
-		while ((line = reader.ReadLine()) != null)
-		{
-			int[] words = line.Split(',').Select(item => int.Parse(item)).ToArray();
-			int id = words[0];
-			
-			for(int i = 1; i < words.Count(); i+=2){
-				if(words[i] > maxX){
-					maxX = words[i];
-				}
-				if(words[i+1] > maxY){
-					maxY = words[i+1];
-				}
+		foreach (var borderDetails in bordersList.Borders)
+		{			
+			foreach (var coord in borderDetails.Points) {
+				var splitCoord = coord.Split(",");
+				maxX = Mathf.Max(maxX, int.Parse(splitCoord[0]));
+				maxY = Mathf.Max(maxY, int.Parse(splitCoord[1]));
 			}
 		}
 		
@@ -45,11 +46,8 @@ public class GenerateBorders : MonoBehaviour
     [MenuItem("MyMenu/Test")]
 	static void Test() 
 	{	
-		var (loadedTerrains, loadedCultures, loadedReligions, loadedCountries, loadedProvinces) = LoadPermanentData.Load();
-		
-		foreach(var province in loadedProvinces.Values){
-			Debug.Log(province);
-		}
+		GameState.Instance.Load();
+		Debug.Log("Finished loading game state!");
 	}
 
 	
@@ -66,32 +64,48 @@ public class GenerateBorders : MonoBehaviour
 			}
 		}
 		
-        string path = "Assets/MapGeneration/borders_points.csv";
+        string path = "Assets/Data/borders_perm.yaml";
         StreamReader reader = new StreamReader(path); 
-		
-		string line;
-		while ((line = reader.ReadLine()) != null)
-		{
-			int[] words = line.Split(',').Select(item => int.Parse(item)).ToArray();
-			int id = words[0];
 
+		var deserializer = new DeserializerBuilder()
+			.WithNamingConvention(CamelCaseNamingConvention.Instance)
+			.Build();
+
+		var bordersList = deserializer.Deserialize<BordersList>(reader);
+		
+		foreach (var borderDetails in bordersList.Borders)
+		{			
 			GameObject border = Instantiate(bordersContainer.borderPrefab,  new Vector3(0,0,0), Quaternion.identity);
-			border.name = id.ToString();
+			border.name = borderDetails.Index.ToString();
 			border.transform.parent = bordersContainer.transform;
 			
 			LineRenderer lr = border.GetComponent<LineRenderer>();
-			lr.positionCount = (words.Count() - 1)/2;
+			lr.positionCount = borderDetails.Points.Count();
 			
-			for(int i = 1; i < words.Count(); i+=2){
-				Vector3 pos = new Vector3(words[i], -words[i+1], 0);
-				lr.SetPosition((i - 1) / 2, pos);
+			int i = 0;
+			foreach (var coord in borderDetails.Points) {
+				var splitCoord = coord.Split(",");
+				Vector3 pos = new Vector3(int.Parse(splitCoord[0]), -int.Parse(splitCoord[1]), 0);
+				lr.SetPosition(i, pos);
+				i++;
 			}
 			
 			lr.Simplify(0.1f);
-		}	
-		
+		}
+
 		Debug.Log("Updated borders!");
-    }
+	}
+		
+	public class BordersList 
+	{
+		public List<LoadedBorder> Borders{ get; set; } 
+	}
+	
+	public class LoadedBorder 
+	{
+		public int Index  { get; set; }
+		public List<string> Points  { get; set; }
+	}
 
     [MenuItem("MyMenu/Update Map", true)]
     static bool ValidateUpdateMap()

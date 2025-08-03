@@ -1,10 +1,12 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct Terrain {
+[Serializable]
+public class Terrain {
 	// permanent
 	public int id;
 	public string name;
@@ -21,7 +23,8 @@ Name: {name}";
 	}
 }
 
-public struct Culture {
+[Serializable]
+public class Culture {
 	// permanent
 	public int id;
 	public string name;
@@ -38,7 +41,8 @@ Name: {name}";
 	}
 }
 
-public struct Religion {
+[Serializable]
+public class Religion {
 	// permanent
 	public int id;
 	public string name;
@@ -55,7 +59,8 @@ Name: {name}";
 	}
 }
 
-public struct Country {
+[Serializable]
+public class Country {
 	// permanent
 	public int id;
 	public string name;
@@ -67,9 +72,6 @@ public struct Country {
 	public Country(int _id, string _name) {
 		id = _id;
 		name = _name;
-		
-		rulingCulture = null;
-		rulingReligion = null;
 	}
 	
 	public override string ToString() {
@@ -81,12 +83,14 @@ Religion: {rulingReligion}";
 	}
 }
 
-public struct Province {
+[Serializable]
+public class Province {
 	// permanent
 	public int id;
 	public string name;
 	public Terrain terrain;
 	public Vector2 geographicalCenter;
+	public Color32 testColor;
 	
 	// dynamic
 	public List<Pop>? pops;
@@ -97,9 +101,9 @@ public struct Province {
 	public Religion? dominantReligion;
 	
 	
-	public Province(int _id, string _name,Terrain _terrain, Vector3 _geographicalCenter) {
+	public Province(int _id, string _name,Terrain _terrain, Vector3 _geographicalCenter, Color32 _testColor) {
 		// assign permanent values
-		id = _id; name = _name; terrain = _terrain; geographicalCenter = _geographicalCenter;
+		id = _id; name = _name; terrain = _terrain; geographicalCenter = _geographicalCenter; testColor = _testColor;
 		
 		// assign dynamic defaults
 		pops = null;
@@ -123,14 +127,13 @@ Dominant Religion: {dominantReligion}";
 	}
 }
 
-public struct Pop {
+public class Pop {
 	// permanent
 	public int id;
-	public Culture baseCulture;
-	public Religion baseReligion;
+	public Culture? baseCulture;
+	public Religion? baseReligion;
 	
-	
-	public string GetName() => $"{baseCulture.name} {baseReligion.name}";
+	public string GetName() => $"{baseCulture?.name} {baseReligion?.name}";
 	
 	public override string ToString() {
 		return 

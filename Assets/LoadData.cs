@@ -4,27 +4,24 @@ using UnityEngine;
 using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions; 
+using AYellowpaper.SerializedCollections;
 
 public class LoadPermanentData
 {
-	public static (Dictionary<int, Terrain> te, Dictionary<int, Culture> cu, Dictionary<int, Religion> re, Dictionary<int, Country> co, Dictionary<int, Province> pr) Load() {
+	public static (SerializedDictionary<int, Terrain> te, SerializedDictionary<int, Culture> cu, SerializedDictionary<int, Religion> re, SerializedDictionary<int, Country> co, SerializedDictionary<int, Province> pr) Load() {
 		var loadedTerrains = loadTerrains();
 		var loadedCultures = loadCultures();
 		var loadedReligions = loadReligions();
 		var loadedCountries = loadCountries();
 		var loadedProvinces = loadProvinces(loadedTerrains, loadedCountries);
 		
-		InitializeData.InitData(
-			loadedTerrains, loadedCultures, loadedReligions, loadedCountries, loadedProvinces
-		);
-		
 		return (loadedTerrains, loadedCultures, loadedReligions, loadedCountries, loadedProvinces);
 	}
 	
 	// terrains
-	public static Dictionary<int, Terrain> loadTerrains() 
+	public static SerializedDictionary<int, Terrain> loadTerrains() 
 	{
-		var loadedTerrains = new Dictionary<int, Terrain>();
+		var loadedTerrains = new SerializedDictionary<int, Terrain>();
 		
         string path = "Assets/Data/terrains_perm.yaml";
         StreamReader reader = new StreamReader(path); 
@@ -60,9 +57,9 @@ public class LoadPermanentData
 	}
 	
 	// cultures
-	public static Dictionary<int, Culture> loadCultures() 
+	public static SerializedDictionary<int, Culture> loadCultures() 
 	{
-		var loadedCultures = new Dictionary<int, Culture>();
+		var loadedCultures = new SerializedDictionary<int, Culture>();
 		
         string path = "Assets/Data/cultures_perm.yaml";
         StreamReader reader = new StreamReader(path); 
@@ -98,9 +95,9 @@ public class LoadPermanentData
 	}
 	
 	// religions
-	public static Dictionary<int, Religion> loadReligions() 
+	public static SerializedDictionary<int, Religion> loadReligions() 
 	{
-		var loadedReligions = new Dictionary<int, Religion>();
+		var loadedReligions = new SerializedDictionary<int, Religion>();
 		
         string path = "Assets/Data/religions_perm.yaml";
         StreamReader reader = new StreamReader(path); 
@@ -136,9 +133,9 @@ public class LoadPermanentData
 	}
 	
 	// countries
-	public static Dictionary<int, Country> loadCountries() 
+	public static SerializedDictionary<int, Country> loadCountries() 
 	{
-		var loadedCountries = new Dictionary<int, Country>();
+		var loadedCountries = new SerializedDictionary<int, Country>();
 		
         string path = "Assets/Data/countries_perm.yaml";
         StreamReader reader = new StreamReader(path); 
@@ -174,12 +171,12 @@ public class LoadPermanentData
 	}
 	
 	// provinces
-	public static Dictionary<int, Province> loadProvinces(
-		Dictionary<int, Terrain> loadedTerrains,
-		Dictionary<int, Country> loadedCountries
+	public static SerializedDictionary<int, Province> loadProvinces(
+		SerializedDictionary<int, Terrain> loadedTerrains,
+		SerializedDictionary<int, Country> loadedCountries
 	)
 	{
-		var loadedProvinces = new Dictionary<int, Province>();
+		var loadedProvinces = new SerializedDictionary<int, Province>();
 		
         string path = "Assets/Data/provinces_perm.yaml";
         StreamReader reader = new StreamReader(path); 
@@ -197,11 +194,15 @@ public class LoadPermanentData
 			var identifiedTerrain = loadedTerrains.ContainsKey(province.Terrain) ? loadedTerrains[province.Terrain] : unknownTerrain;
 			var geograpicalCenter = new Vector2(province.CenterX, province.CenterY);
 			
+			string[] colorComponents = province.Color.Split(",");
+			var testColor = new Color32((byte)int.Parse(colorComponents[0]), (byte)int.Parse(colorComponents[1]), (byte)int.Parse(colorComponents[2]), 255);
+			
 			Province newProvince = new Province(
 				province.id,
 				province.Name,
 				identifiedTerrain,
-				geograpicalCenter
+				geograpicalCenter,
+				testColor
 			);
 			
 			loadedProvinces.Add(province.id, newProvince);
@@ -220,7 +221,16 @@ public class LoadPermanentData
 		public int id  { get; set; }
 		public string Name  { get; set; }
 		public int Terrain  { get; set; }
+		public string Color { get; set; }
 		public int CenterX  { get; set; }
 		public int CenterY  { get; set; }
+		public int Area { get; set; }
+		public List<LoadedBorderIDs> Borders { get; set; }
+	}
+	
+	public class LoadedBorderIDs
+	{
+		public int[] Borders { get; set; }
+		public int Province { get; set; }
 	}
 }

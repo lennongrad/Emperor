@@ -19,13 +19,16 @@ public class MapController : MonoBehaviour
 
 	Color32 GetProvinceColor(int id){
 		Color32 baseColor = new Color32(0,0,0,255);
-		if (id < colors.Count){
-			baseColor = colors[id];
-		} else {			
-			while(id >= backupColors.Count){
-				backupColors.Add(new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255),255));
-			}
-			baseColor = backupColors[id];
+		// if (id < colors.Count){
+			// baseColor = colors[id];
+		// } else {			
+			// while(id >= backupColors.Count){
+				// backupColors.Add(new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255),255));
+			// }
+			// baseColor = backupColors[id];
+		// }
+		if(GameState.Instance.Provinces.ContainsKey(id)){
+			baseColor = GameState.Instance.Provinces[id].testColor;
 		}
 		
 		if(selected != -1){
@@ -74,6 +77,10 @@ public class MapController : MonoBehaviour
 		
         texture.Apply();
         secondaryTexture.Apply();
+	}
+	
+	void Start(){
+		GameState.Instance.Test();
 	}
 	
 	public Vector3 lastPosition = new Vector3(0,0,-1);
