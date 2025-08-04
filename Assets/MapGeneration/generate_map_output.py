@@ -358,7 +358,18 @@ for province in data:
     color_str = province["color"].split(",")
     color = (int(color_str[0]), int(color_str[1]), int(color_str[2]))
     
-    province["terrain"] = 0 if color[2] >= 220 else random.randint(1,4)
+    if color[2] >= 220:
+        province["terrain"] = 0 # ocean
+    elif color[0] == 90 and color[1] == 90:
+        province["terrain"] = 1 # glaciers
+    elif color[0] == 64 and color[1] == 64:
+        province["terrain"] = 2 # mountain
+    elif color[0] == 110 and color[1] == 110:
+        province["terrain"] = 3 # desert
+    elif color[0] == 140 and color[1] == 140:
+        province["terrain"] = 4 # jungle
+    else:
+        province["terrain"] = random.randint(5,10)
     
     if color in provinces_by_color:
         associated_data = provinces_by_color[color]
