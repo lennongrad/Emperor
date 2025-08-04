@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +8,7 @@ using AYellowpaper.SerializedCollections;
 
 public class GameState : MonoBehaviour
 {
-	private static GameState _Instance;
+	private static GameState? _Instance;
 	public static GameState Instance
 	{
 		get
@@ -15,7 +17,7 @@ public class GameState : MonoBehaviour
 			{
 				_Instance = GameObject.FindObjectOfType<GameState>();
 			}
-			return _Instance;
+			return _Instance!;
 		}
 	}
 	 
@@ -25,7 +27,19 @@ public class GameState : MonoBehaviour
 	public SerializedDictionary<int, Country> Countries = new SerializedDictionary<int, Country>();
 	public SerializedDictionary<int, Province> Provinces = new SerializedDictionary<int, Province>();
 	
-	public int selected = -1;
+	public Province? SelectedProvince = null;
+	int selected = -1;
+	public int Selected {
+		get => selected;
+		set {
+			selected = value;
+			if(selected == -1){
+				SelectedProvince = null;
+			} else {
+				SelectedProvince = Provinces[selected];
+			}
+		}
+	}
 	
     public void Load()
     {
@@ -42,7 +56,15 @@ public class GameState : MonoBehaviour
 		Provinces = loadedProvinces;
 	}
 	
+	public Province? GetSelectedProvince() {
+		if(selected == -1){
+			return null;
+		}
+		return Provinces[selected];
+	}
+	
 	public void Test(){
-		Debug.Log(Provinces[0]);
+		Debug.Log(GetSelectedProvince());
+		//Debug.Log(selectedProvince.GetAllBorders().Length);
     }
 }

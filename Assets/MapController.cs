@@ -7,33 +7,21 @@ public class MapController : MonoBehaviour
 	public List<Color32> colors;
 	public Texture2D map;
 	
-	List<Color32> backupColors = new List<Color32>();
 	Texture2D texture;
 	Texture2D secondaryTexture;
-	
-	Color32 MultiplyColor(Color32 a, Color32 b) {
-		return new Color32((byte)(a.r * b.r / 255), (byte)(a.g * b.g / 255), (byte)(a.b * b.b / 255), (byte)(a.a * b.a / 255));
-	}
 
 	Color32 GetProvinceColor(int id){
 		Color32 baseColor = new Color32(0,0,0,255);
-		// if (id < colors.Count){
-			// baseColor = colors[id];
-		// } else {			
-			// while(id >= backupColors.Count){
-				// backupColors.Add(new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255),255));
-			// }
-			// baseColor = backupColors[id];
-		// }
+		
 		if(GameState.Instance.Provinces.ContainsKey(id)){
 			baseColor = GameState.Instance.Provinces[id].testColor;
 		}
 		
-		if(GameState.Instance.selected != -1){
-			if(id == GameState.Instance.selected){
+		if(GameState.Instance.Selected != -1){
+			if(id == GameState.Instance.Selected){
 				return new Color32(255,255,255,255);
 			}
-			return Color32.Lerp(baseColor, new Color32(0,0,0,255), 0.75f);
+			//return //Color32.Lerp(baseColor, new Color32(0,0,0,255), 0.75f);
 		}
 		
 		return baseColor;
@@ -65,36 +53,44 @@ public class MapController : MonoBehaviour
         secondaryTexture.Apply();
 	}
 	
-	void Start(){
-		GameState.Instance.Test();
-	}
-	
-	public Vector3 lastPosition = new Vector3(0,0,-1);
 	public Camera playerCamera;
 	public float baseZoom = 400f;
-	float targetZoom = -1f;
+	float targetZoom = 400f;
+	public Vector3 drawDownPosition = new Vector3(0,0,-1);
+	
 	void Update(){
 		SetColors();
 		
-		if(targetZoom < 0){
-			targetZoom = baseZoom;
+		if(Input.GetKeyDown("d")){
+			GameState.Instance.Test();
 		}
-		targetZoom = Mathf.Min(450f, Mathf.Max(100f, targetZoom - Input.mouseScrollDelta.y * 15f));
+		
+		targetZoom = Mathf.Min(baseZoom, Mathf.Max(100f, targetZoom - Input.mouseScrollDelta.y * 15f));
 		playerCamera.orthographicSize = (int)Mathf.Lerp(playerCamera.orthographicSize, targetZoom, 0.1f);
 		
-		if(Input.GetMouseButton(2)){
-			Vector3 currentPosition = Input.mousePosition;
-			float modifier = playerCamera.orthographicSize / baseZoom;
-			if(lastPosition.z != -1){
-				playerCamera.transform.position = new Vector3(
-					playerCamera.transform.position.x + (lastPosition.x - currentPosition.x) * modifier, 
-					playerCamera.transform.position.y + (lastPosition.y - currentPosition.y) * modifier, 
-					playerCamera.transform.position.z);
-			}
-			lastPosition = currentPosition;
-		} else {
-			lastPosition = new Vector3(0,0,-1);
+		float minX = 1.5856777f * playerCamera.orthographicSize;
+		float maxX = 3844f - playerCamera.orthographicSize / 0.62861f;
+		float minY = playerCamera.orthographicSize/0.976479f - 2167f;
+		float maxY = -playerCamera.orthographicSize;
+		
+		if(Input.GetMouseButtonDown(2)){
+			drawDownPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		} else if (Input.GetMouseButton(2)){
+			Vector3 currentPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			
+			playerCamera.transform.position = new Vector3(
+				playerCamera.transform.position.x + (drawDownPosition.x - currentPosition.x),
+				playerCamera.transform.position.y + (drawDownPosition.y - currentPosition.y),
+				playerCamera.transform.position.z
+			);
 		}
+		
+		playerCamera.transform.position = new Vector3(
+			Mathf.Min(maxX, Mathf.Max(minX, playerCamera.transform.position.x)),
+			Mathf.Min(maxY, Mathf.Max(minY, playerCamera.transform.position.y)),
+			playerCamera.transform.position.z
+		);
+		
         if(Input.GetMouseButtonDown(0))
 		{
 			Vector3 p = Input.mousePosition;
@@ -111,12 +107,12 @@ public class MapController : MonoBehaviour
 				
 				var selectedProvince = GameState.Instance.Provinces[id];
 				if(selectedProvince.terrain.is_ocean){
-					GameState.Instance.selected = -1;
+					GameState.Instance.Selected = -1;
 				} else {
-					GameState.Instance.selected = id;
+					GameState.Instance.Selected = id;
 				}
 			} else {
-				GameState.Instance.selected = -1;
+				GameState.Instance.Selected = -1;
 			}
 		}  
     }

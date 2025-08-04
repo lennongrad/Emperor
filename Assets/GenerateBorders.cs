@@ -85,19 +85,17 @@ public class GenerateBorders : MonoBehaviour
 			
 			var bc = border.GetComponent<BorderController>();
 			
-			foreach(var lr in bc.Lines){				
-				lr.positionCount = borderDetails.Points.Count();
-				
-				int i = 0;
-				foreach (var coord in borderDetails.Points) {
-					var splitCoord = coord.Split(",");
-					Vector3 pos = new Vector3(int.Parse(splitCoord[0]), -int.Parse(splitCoord[1]), 0);
-					lr.SetPosition(i, pos);
-					i++;
-				}
-				
-				lr.Simplify(0.1f);
+			bc.lr.positionCount = borderDetails.Points.Count();
+			
+			int i = 0;
+			foreach (var coord in borderDetails.Points) {
+				var splitCoord = coord.Split(",");
+				Vector3 pos = new Vector3(int.Parse(splitCoord[0]), -int.Parse(splitCoord[1]), 0);
+				bc.lr.SetPosition(i, pos);
+				i++;
 			}
+			
+			bc.lr.Simplify(0.1f);
 				
 			generatedBorders[borderDetails.Index] = bc;
 		}

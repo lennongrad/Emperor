@@ -197,12 +197,18 @@ public class LoadPermanentData
 			string[] colorComponents = province.Color.Split(",");
 			var testColor = new Color32((byte)int.Parse(colorComponents[0]), (byte)int.Parse(colorComponents[1]), (byte)int.Parse(colorComponents[2]), 255);
 			
+			var borders = new SerializedDictionary<int, int[]>();
+			foreach(var borderIDs in province.Borders){
+				borders[borderIDs.Province] = borderIDs.Borders;
+			}
+			
 			Province newProvince = new Province(
 				province.id,
 				province.Name,
 				identifiedTerrain,
 				geograpicalCenter,
-				testColor
+				testColor,
+				borders
 			);
 			
 			loadedProvinces.Add(province.id, newProvince);

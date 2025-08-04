@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using AYellowpaper.SerializedCollections;
@@ -8,30 +9,34 @@ public class BordersContainer : MonoBehaviour
 	public SerializedDictionary<int, BorderController> borders;
 	public GameObject borderPrefab;
 	
-	int getBorderValue(int id)
+	public float[] Widths;
+	
+	int getBorderValue(int id, int[] selectedBorders)
 	{
-		return 0;
-		// if(id < 20){
-			// return 1;
-		// }
-		// if(id < 40){
-			// return 0;
-		// }
-		// return -1;
+		if(selectedBorders.Length != 0 && Array.IndexOf(selectedBorders, id) != -1){
+			return 3;
+		}
+		
+		return 1;
 	}
 	
 	void UpdateBorders() 
-	{
+	{		
+		var selectedProvince = GameState.Instance.GetSelectedProvince();
+		int[] selectedBorders = {};
+		
+		if(selectedProvince != null){
+			selectedBorders = selectedProvince.GetAllBorders();
+		}
+		
 		foreach(var border in borders){
-			int calculatedBorder = getBorderValue(border.Key);
+			int calculatedBorder = getBorderValue(border.Key, selectedBorders);
 			
-			for(int i = 0; i < border.Value.Lines.Length; i++){
-				border.Value.Lines[i].enabled = (i == calculatedBorder);
-			}
+			border.Value.SetLineWidth(Widths[calculatedBorder]);
 		}
 	}
 	
-	void Start() {
+	void FixedUpdate() {
 		UpdateBorders();
 	}
 }

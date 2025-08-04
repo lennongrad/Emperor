@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AYellowpaper.SerializedCollections;
 
 [Serializable]
 public class Terrain {
@@ -93,6 +94,7 @@ public class Province {
 	public Terrain terrain;
 	public Vector2 geographicalCenter;
 	public Color32 testColor;
+	public SerializedDictionary<int, int[]> borders;
 	
 	// dynamic
 	public List<Pop>? pops;
@@ -103,9 +105,9 @@ public class Province {
 	public Religion? dominantReligion;
 	
 	
-	public Province(int _id, string _name,Terrain _terrain, Vector3 _geographicalCenter, Color32 _testColor) {
+	public Province(int _id, string _name,Terrain _terrain, Vector3 _geographicalCenter, Color32 _testColor, SerializedDictionary<int, int[]> _borders) {
 		// assign permanent values
-		id = _id; name = _name; terrain = _terrain; geographicalCenter = _geographicalCenter; testColor = _testColor;
+		id = _id; name = _name; terrain = _terrain; geographicalCenter = _geographicalCenter; testColor = _testColor; borders = _borders;
 		
 		// assign dynamic defaults
 		pops = null;
@@ -116,7 +118,23 @@ public class Province {
 		dominantReligion = null;
 	}
 	
+	public int[] GetAllBorders() {
+		var b = new List<int>();
+		foreach(var borderDetail in borders){
+			foreach(var id in borderDetail.Value){
+				b.Add(id);
+			}
+		}
+		return b.ToArray();
+	}
+	
 	public override string ToString() {
+		var provinceBorders = "";
+		foreach(var borderDetail in borders){
+			var comb = String.Join(", ", borderDetail.Value);
+			provinceBorders += $"\n-- {borderDetail.Key}: {comb}";
+		}
+		
 		return 
 		 $@"ID: {id}
 Name: {name}
@@ -124,6 +142,7 @@ Terrain: {terrain}
 Geographical Center: {geographicalCenter}
 Pops: {pops}
 Population: {population}
+Borders: {provinceBorders}
 Dominant Culture: {dominantCulture}
 Dominant Religion: {dominantReligion}";
 	}
