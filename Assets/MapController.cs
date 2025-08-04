@@ -11,8 +11,6 @@ public class MapController : MonoBehaviour
 	Texture2D texture;
 	Texture2D secondaryTexture;
 	
-	public int selected = -1;
-	
 	Color32 MultiplyColor(Color32 a, Color32 b) {
 		return new Color32((byte)(a.r * b.r / 255), (byte)(a.g * b.g / 255), (byte)(a.b * b.b / 255), (byte)(a.a * b.a / 255));
 	}
@@ -31,8 +29,8 @@ public class MapController : MonoBehaviour
 			baseColor = GameState.Instance.Provinces[id].testColor;
 		}
 		
-		if(selected != -1){
-			if(id == selected){
+		if(GameState.Instance.selected != -1){
+			if(id == GameState.Instance.selected){
 				return new Color32(255,255,255,255);
 			}
 			return Color32.Lerp(baseColor, new Color32(0,0,0,255), 0.75f);
@@ -46,18 +44,6 @@ public class MapController : MonoBehaviour
 	}
 	
 	public void SetColors() {
-        if(texture == null){
-			
-			//new Texture2D(256, 32, TextureFormat.RGBA32, false);
-			//GetComponent<Renderer>().material.mainTexture = texture;
-			//texture.filterMode = FilterMode.Point;
-		}
-		
-		if(secondaryTexture == null){
-			// secondaryTexture = new Texture2D(256, 32, TextureFormat.RGBA32, false);
-			// GetComponent<Renderer>().material.SetTexture("_SecondaryTex", secondaryTexture);
-			// secondaryTexture.filterMode = FilterMode.Point;
-		}
 		
 		texture = (Texture2D)GetComponent<Renderer>().sharedMaterial.GetTexture("_MainTex");
 		secondaryTexture = (Texture2D)GetComponent<Renderer>().sharedMaterial.GetTexture("_SecondaryTex");
@@ -93,7 +79,7 @@ public class MapController : MonoBehaviour
 		if(targetZoom < 0){
 			targetZoom = baseZoom;
 		}
-		targetZoom -= Input.mouseScrollDelta.y * 15f;
+		targetZoom = Mathf.Min(450f, Mathf.Max(100f, targetZoom - Input.mouseScrollDelta.y * 15f));
 		playerCamera.orthographicSize = (int)Mathf.Lerp(playerCamera.orthographicSize, targetZoom, 0.1f);
 		
 		if(Input.GetMouseButton(2)){
@@ -122,9 +108,15 @@ public class MapController : MonoBehaviour
 				Color pixel = (map.GetPixel((int)pos.x, map.height - (int)pos.y));
 				//print($"({pos.x},{pos.y}):{pixel.g * 255},{pixel.r * 255}");
 				int id = (int)(pixel.r * 255f * 256f) + (int)(pixel.g * 255f);
-				selected = id;
+				
+				var selectedProvince = GameState.Instance.Provinces[id];
+				if(selectedProvince.terrain.is_ocean){
+					GameState.Instance.selected = -1;
+				} else {
+					GameState.Instance.selected = id;
+				}
 			} else {
-				selected = -1;
+				GameState.Instance.selected = -1;
 			}
 		}  
     }

@@ -347,13 +347,9 @@ with open("../Data/provinces_perm.yaml") as stream:
 
 data.sort(key=lambda x: x["id"])
 
-new_data = []
-
 for province in data:
     if not "name" in province or "Unnamed" in province["name"]:
         province["name"] = f"Unnamed #{province['id']}"
-    if not "terrain" in province:
-        province["terrain"] = 0
     if not "centerX" in province:
         province["centerX"] = 0
     if not "centerY" in province:
@@ -361,6 +357,8 @@ for province in data:
     
     color_str = province["color"].split(",")
     color = (int(color_str[0]), int(color_str[1]), int(color_str[2]))
+    
+    province["terrain"] = 0 if color[2] >= 220 else random.randint(1,4)
     
     if color in provinces_by_color:
         associated_data = provinces_by_color[color]
@@ -370,9 +368,8 @@ for province in data:
         province["area"] = associated_data["area"]
         
         
-        new_data.append(province)
     else:
-        print(f"Could not find {color}")
+        pass#print(f"Could not find {color}")
 
 for province in provinces_by_color.values():
     province["yaml"]["borders"] = []
@@ -387,7 +384,7 @@ for province in provinces_by_color.values():
         province["yaml"]["borders"].append(border_def)
 
 with open('../Data/provinces_perm.yaml', 'w', encoding='utf8') as outfile:
-    m_data = {"provinces": new_data}
+    m_data = {"provinces": data}
     yaml.dump(m_data, outfile, default_flow_style=False, allow_unicode=True)
 
 
@@ -422,7 +419,6 @@ for color, province in provinces_by_color.items():
 
 final_filename = "output_map.png"
 d_pixel.save_png(final_filename)
-d_pixel.save_png("output_map_s.png")
 # remove anti-aliasing
 Image.MAX_IMAGE_PIXELS = 933120000
 image = Image.open(final_filename)

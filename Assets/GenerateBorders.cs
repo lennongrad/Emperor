@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions; 
+using AYellowpaper.SerializedCollections;
 
 public class GenerateBorders : MonoBehaviour
 {
@@ -43,8 +44,8 @@ public class GenerateBorders : MonoBehaviour
 	}
 	
 	
-    [MenuItem("MyMenu/Test")]
-	static void Test() 
+    [MenuItem("MyMenu/Load Game State")]
+	static void LoadGameState() 
 	{	
 		GameState.Instance.Load();
 		Debug.Log("Finished loading game state!");
@@ -59,7 +60,7 @@ public class GenerateBorders : MonoBehaviour
 		var tempList = bordersContainer.transform.Cast<Transform>().ToList();
 		foreach(var child in tempList)
 		{
-			if(child.GetComponent<BorderController>() != null) {
+			if(true){//child.GetComponent<BorderController>() != null) {
 				GameObject.DestroyImmediate(child.gameObject);
 			}
 		}
@@ -72,26 +73,36 @@ public class GenerateBorders : MonoBehaviour
 			.Build();
 
 		var bordersList = deserializer.Deserialize<BordersList>(reader);
+		var generatedBorders = new SerializedDictionary<int, BorderController>();
+		
 		
 		foreach (var borderDetails in bordersList.Borders)
 		{			
 			GameObject border = Instantiate(bordersContainer.borderPrefab,  new Vector3(0,0,0), Quaternion.identity);
-			border.name = borderDetails.Index.ToString();
+			
+			border.name = $"Border #{borderDetails.Index}";
 			border.transform.parent = bordersContainer.transform;
 			
-			LineRenderer lr = border.GetComponent<LineRenderer>();
-			lr.positionCount = borderDetails.Points.Count();
+			var bc = border.GetComponent<BorderController>();
 			
-			int i = 0;
-			foreach (var coord in borderDetails.Points) {
-				var splitCoord = coord.Split(",");
-				Vector3 pos = new Vector3(int.Parse(splitCoord[0]), -int.Parse(splitCoord[1]), 0);
-				lr.SetPosition(i, pos);
-				i++;
+			foreach(var lr in bc.Lines){				
+				lr.positionCount = borderDetails.Points.Count();
+				
+				int i = 0;
+				foreach (var coord in borderDetails.Points) {
+					var splitCoord = coord.Split(",");
+					Vector3 pos = new Vector3(int.Parse(splitCoord[0]), -int.Parse(splitCoord[1]), 0);
+					lr.SetPosition(i, pos);
+					i++;
+				}
+				
+				lr.Simplify(0.1f);
 			}
-			
-			lr.Simplify(0.1f);
+				
+			generatedBorders[borderDetails.Index] = bc;
 		}
+		
+		bordersContainer.borders = generatedBorders;
 
 		Debug.Log("Updated borders!");
 	}

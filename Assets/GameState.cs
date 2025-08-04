@@ -25,6 +25,8 @@ public class GameState : MonoBehaviour
 	public SerializedDictionary<int, Country> Countries = new SerializedDictionary<int, Country>();
 	public SerializedDictionary<int, Province> Provinces = new SerializedDictionary<int, Province>();
 	
+	public int selected = -1;
+	
     public void Load()
     {
 		var (loadedTerrains, loadedCultures, loadedReligions, loadedCountries, loadedProvinces) = LoadPermanentData.Load();

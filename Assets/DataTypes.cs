@@ -10,10 +10,12 @@ public class Terrain {
 	// permanent
 	public int id;
 	public string name;
+	public bool is_ocean;
 	
 	public Terrain(int _id, string _name) {
 		id = _id;
 		name = _name;
+		is_ocean = _id == 0;
 	}
 	
 	public override string ToString() {
