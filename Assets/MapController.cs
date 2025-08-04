@@ -58,6 +58,8 @@ public class MapController : MonoBehaviour
 	float targetZoom = 400f;
 	public Vector3 drawDownPosition = new Vector3(0,0,-1);
 	
+	int i = 0;
+	
 	void Update(){
 		SetColors();
 		
@@ -68,8 +70,8 @@ public class MapController : MonoBehaviour
 		targetZoom = Mathf.Min(baseZoom, Mathf.Max(100f, targetZoom - Input.mouseScrollDelta.y * 15f));
 		playerCamera.orthographicSize = (int)Mathf.Lerp(playerCamera.orthographicSize, targetZoom, 0.1f);
 		
-		float minX = 1.5856777f * playerCamera.orthographicSize;
-		float maxX = 3844f - playerCamera.orthographicSize / 0.62861f;
+		float minX = 0.00109633f * playerCamera.orthographicSize * Screen.width;
+		float maxX = 3844f - playerCamera.orthographicSize * Screen.width * 0.00110352f;
 		float minY = playerCamera.orthographicSize/0.976479f - 2167f;
 		float maxY = -playerCamera.orthographicSize;
 		
@@ -90,6 +92,12 @@ public class MapController : MonoBehaviour
 			Mathf.Min(maxY, Mathf.Max(minY, playerCamera.transform.position.y)),
 			playerCamera.transform.position.z
 		);
+		
+		// i += 1;
+		// if(i > 100){
+			// Debug.Log(Screen.width * playerCamera.orthographicSize);
+			// i = 0;
+		// }
 		
         if(Input.GetMouseButtonDown(0))
 		{
